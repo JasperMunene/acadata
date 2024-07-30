@@ -12,11 +12,11 @@ const Sidebar = () => {
   const email = user?.emailAddresses[0].emailAddress
 
   return (
-    <section className="sidebar no-scrollbar">
+    <section className="sidebar no-scrollbar flex flex-col justify-between h-full">
       <nav className="flex flex-col lg:gap-3 md:gap-6">
-        <Link href="/" className="mb-10 cursor-pointer text-5xl font-mono font-semibold text-[#3A5AFF] tracking-wide">AcaData</Link>
+        <Link href="/" className="mb-10 cursor-pointer font-mono font-semibold text-[#3A5AFF] tracking-wide text-4xl">AcaData</Link>
         {sidebarLinks.map((item) => {
-          const isActive = pathname === item.route || pathname.startsWith(`${item.route}/`)
+          const isActive = pathname === item.route
           const IconComponent = icons[item.icon]
           return (
             <Link href={item.route} key={item.label} className={`sidebar-link ${isActive ? 'bg-blue-500' : 'bg-inherit'}`}>
@@ -29,17 +29,17 @@ const Sidebar = () => {
             </Link>
           )
         })}
-        <div className="sidebar-footer">
-          <hr />
-          <div className="pt-4 pb-2 sidebar-user">
-            <UserButton />
-            <div className="sidebar-user-info">
-              <p className="font-semibold">{user?.fullName}</p>
-              <p>{email}</p>
-            </div>
+      </nav>
+      <div className="sidebar-footer">
+        <hr />
+        <div className="pt-4 pb-2 sidebar-user flex items-center gap-3">
+          <UserButton />
+          <div className="sidebar-user-info">
+            <p className="font-semibold text-nowrap text-sm">{user?.fullName}</p>
+            <p className="text-xs hidden 2xl:block">{email}</p>
           </div>
         </div>
-      </nav>
+      </div>
     </section>
   )
 }

@@ -1,5 +1,5 @@
 
-import { Ruler, BookOpen, BriefcaseBusiness, House, School, Presentation, BellElectric, Library, ScrollText, NotepadText, ChartNoAxesColumn } from 'lucide-react';
+import { Ruler, BookOpen, BriefcaseBusiness, House, School, Presentation, Library, ScrollText, NotepadText, ChartNoAxesColumn } from 'lucide-react';
 
 interface targetAudience {
   name: string;
@@ -54,11 +54,6 @@ export const sidebarLinks: sidebarLinks[] = [
     label: "Schools",
   },
   {
-    icon: "BellElectric",
-    route: "/dashboard/classes",
-    label: "Classes",
-  },
-  {
     icon: "Presentation",
     route: "/dashboard/subjects",
     label: "Subjects",
@@ -97,7 +92,6 @@ export const icons = {
   BriefcaseBusiness,
   House,
   School,
-  BellElectric,
   Presentation,
   Library,
   ScrollText,

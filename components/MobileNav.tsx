@@ -13,12 +13,12 @@ import Image from "next/image"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { icons } from "@/constants/constants"
-import { UserButton, useUser } from "@clerk/nextjs"
+import { UserButton, useUser, useClerk } from "@clerk/nextjs"
 
 const MobileNav = () => {
   const pathname = usePathname()
   const { user } = useUser()
-  console.log(user)
+  const { signOut } = useClerk();
   const email = user?.emailAddresses[0].emailAddress
   const url = user?.imageUrl
 
@@ -41,7 +41,7 @@ const MobileNav = () => {
           <div className="flex flex-col flex-1 overflow-y-auto">
             <nav className="flex flex-col gap-6 pt-4 px-4 text-black">
               {sidebarLinks.map((item) => {
-                const isActive = pathname === item.route || pathname.startsWith(`${item.route}/`)
+                const isActive = pathname === item.route
                 const IconComponent = icons[item.icon]
 
                 return (
@@ -55,11 +55,21 @@ const MobileNav = () => {
               })}
             </nav>
           </div>
-          <div className="border-t border-gray-200 p-4">
+          <div className="border-t border-gray-200 pt-3">
             <div className="flex items-center gap-3">
-              <UserButton />
-              <div>
-                <p className="text-black font-semibold text-sm">{user?.fullName}</p>
+              <Link href='/user-profile' className="inline-block rounded-full overflow-hidden border-2 border-gray-300 hover:border-blue-500 focus:border-blue-500 transition">
+                <img src={url} alt="Profile Image" className="object-cover w-8 h-8" />
+              </Link>
+              <div className="flex-1">
+                <div className="flex justify-between items-center">
+                  <p className="text-black font-semibold text-sm">{user?.fullName}</p>
+                  <button 
+                    onClick={() => signOut({ redirectUrl: '/' })}  
+                    className="text-blue-500 hover:text-blue-700 transition"
+                  >
+                    <Image src="/icons/logout.svg" width={20} height={20} alt="logout" />
+                  </button>
+                </div>
                 <p className="text-gray-600 text-xs">{email}</p>
               </div>
             </div>

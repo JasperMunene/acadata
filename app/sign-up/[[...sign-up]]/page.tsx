@@ -1,6 +1,5 @@
 // Import necessary Clerk components
 import { SignUp } from "@clerk/nextjs";
-import React from 'react';
 
 // Custom styles for the SignIn component
 const customStyles = {

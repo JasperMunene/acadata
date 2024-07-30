@@ -49,7 +49,7 @@
   }
 
   .sidebar {
-    @apply sticky left-0 top-0  h-screen w-fit flex-col justify-between border-r border-gray-200 bg-white pt-8 text-white sm:p-4 xl:p-6 2xl:w-[355px] hidden md:flex;
+    @apply sticky left-0 top-0  h-full w-[190px] flex-col justify-between border-r border-gray-200 bg-white pt-8 text-white sm:p-4 xl:p-6 2xl:w-[355px] hidden md:flex;
   }
   
   .sidebar-icon {
@@ -83,6 +83,10 @@
 
   .mobilenav-sheet_close {
     @apply flex gap-3 items-center p-4 rounded-lg w-full max-w-60;
+  }
+
+  .footer_image {
+    @apply relative size-5 max-xl:w-full max-xl:flex max-xl:justify-center max-xl:items-center;
   }
   
 }

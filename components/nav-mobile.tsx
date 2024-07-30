@@ -51,7 +51,7 @@ export const NavMobile = () => {
                             className="block w-full my-2 py-5 text-center rounded-xl bg-white border border-gray-300 text-gray-700 hover:bg-white/90"
                             onClick={() => setOpen(false)}
                         >
-                            Log In
+                            Sign In
                         </motion.a>
                         </SignedOut>
                         <SignedIn>

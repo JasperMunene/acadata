@@ -15,7 +15,7 @@ export const NavDesktop = () => {
                 href='/sign-in' 
                 className="text-center border border-gray-300 py-2 px-6 rounded-lg text-gray-700 hover:bg-gray-100 transition duration-300 ease-in-out"
             >
-                Log In
+                Sign In
             </Link>
             </SignedOut>
             <SignedIn>
