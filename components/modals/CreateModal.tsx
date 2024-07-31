@@ -1,147 +1,182 @@
-// CreateModal.tsx
-'use client'
+import React, { useState } from 'react';
+import Modal from './Modal';
+import { Plus } from 'lucide-react';
+import { supabase } from '@/lib/supabaseClient';
+import { useToast } from "@/components/ui/use-toast"
 
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import { z } from "zod"
-import { Plus, X } from "lucide-react"
+type CreateModalProps = {
+  isOpen: boolean;
+  onClose: () => void;
+  
+};
 
-const formSchema = z.object({
-    name: z.string().min(5, 'Name must be at least 5 characters').max(50, 'Name cannot exceed 50 characters').trim(),
-    address: z.string().min(3, 'Address must be at least 3 characters').max(10, 'Address cannot exceed 10 characters').trim(),
-    city: z.string().min(2, 'City must be at least 2 characters'),
-    phone: z.string().min(10, 'Phone number must be at least 10 digits').max(15, 'Phone number cannot exceed 15 digits'),
-    email: z.string().email('Invalid email format'),
-    type: z.enum(['private', 'public'], { invalid_type_error: 'Invalid type' })
-});
+const CreateModal: React.FC<CreateModalProps> = ({ isOpen, onClose }) => {
+  const [formData, setFormData] = useState({
+    name: '',
+    address: '',
+    phone: '',
+    email: '',
+    city: '',
+    type: 'Public'
+  });
 
-export function CreateModal({ isOpen, onClose }: { isOpen: boolean, onClose: () => void }) {
-    const form = useForm<z.infer<typeof formSchema>>({
-        resolver: zodResolver(formSchema),
-        defaultValues: {
-            name: 'AcaData School',
-            address: '123 Main St',
-            city: 'Nairobi',
-            phone: '1234567890',
-            email: 'acadata@example.com',
-            type: 'private',
-        },
-    });
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
 
-    function onSubmit(values: z.infer<typeof formSchema>) {
-        console.log(values);
-        onClose();
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const { error } = await supabase.from('schools').insert([formData]);
+
+    if (error) {
+      console.error('Error inserting data:', error);
+    } else {
+      clearForm();
+      onClose(); // Automatically close the modal after submission
     }
+  };
 
-    return (
-        <>
-            {isOpen && (
-                <div
-                    id="defaultModal"
-                    tabIndex={-1}
-                    aria-hidden="true"
-                    className="fixed inset-0 z-50 flex items-center justify-center w-full h-full overflow-y-auto overflow-x-hidden"
-                >
-                    <div className="relative w-full max-w-2xl p-4 h-full md:h-auto">
-                        {/* Modal content */}
-                        <div className="relative p-4 bg-white rounded-lg shadow sm:p-5">
-                            {/* Modal header */}
-                            <div className="flex items-center justify-between pb-4 mb-4 border-b rounded-t sm:mb-5">
-                                <h3 className="text-lg font-semibold text-gray-900">
-                                    Add School
-                                </h3>
-                                <button
-                                    type="button"
-                                    className="p-1.5 ml-auto text-sm text-gray-400 bg-transparent rounded-lg hover:bg-gray-200 hover:text-gray-900"
-                                    onClick={onClose}
-                                >
-                                    <X />
-                                    <span className="sr-only">Close modal</span>
-                                </button>
-                            </div>
-                            {/* Modal body */}
-                            <form onSubmit={form.handleSubmit(onSubmit)}>
-                                <div className="grid gap-4 mb-4 sm:grid-cols-2">
-                                    <div>
-                                        <label htmlFor="name" className="block mb-2 text-sm font-medium text-gray-900">Name</label>
-                                        <input
-                                            type="text"
-                                            id="name"
-                                            {...form.register('name')}
-                                            className="block w-full p-2.5 text-sm text-gray-900 bg-gray-50 border border-gray-300 rounded-lg focus:ring-primary-600 focus:border-primary-600"
-                                            placeholder="Type name"
-                                            required
-                                        />
-                                    </div>
-                                    <div>
-                                        <label htmlFor="address" className="block mb-2 text-sm font-medium text-gray-900">Address</label>
-                                        <input
-                                            type="text"
-                                            id="address"
-                                            {...form.register('address')}
-                                            className="block w-full p-2.5 text-sm text-gray-900 bg-gray-50 border border-gray-300 rounded-lg focus:ring-primary-600 focus:border-primary-600"
-                                            placeholder="Type address"
-                                            required
-                                        />
-                                    </div>
-                                    <div>
-                                        <label htmlFor="city" className="block mb-2 text-sm font-medium text-gray-900">City</label>
-                                        <input
-                                            type="text"
-                                            id="city"
-                                            {...form.register('city')}
-                                            className="block w-full p-2.5 text-sm text-gray-900 bg-gray-50 border border-gray-300 rounded-lg focus:ring-primary-600 focus:border-primary-600"
-                                            placeholder="Type city"
-                                            required
-                                        />
-                                    </div>
-                                    <div>
-                                        <label htmlFor="phone" className="block mb-2 text-sm font-medium text-gray-900">Phone</label>
-                                        <input
-                                            type="text"
-                                            id="phone"
-                                            {...form.register('phone')}
-                                            className="block w-full p-2.5 text-sm text-gray-900 bg-gray-50 border border-gray-300 rounded-lg focus:ring-primary-600 focus:border-primary-600"
-                                            placeholder="Type phone"
-                                            required
-                                        />
-                                    </div>
-                                    <div>
-                                        <label htmlFor="email" className="block mb-2 text-sm font-medium text-gray-900">Email</label>
-                                        <input
-                                            type="email"
-                                            id="email"
-                                            {...form.register('email')}
-                                            className="block w-full p-2.5 text-sm text-gray-900 bg-gray-50 border border-gray-300 rounded-lg focus:ring-primary-600 focus:border-primary-600"
-                                            placeholder="Type email"
-                                            required
-                                        />
-                                    </div>
-                                    <div>
-                                        <label htmlFor="type" className="block mb-2 text-sm font-medium text-gray-900">Type</label>
-                                        <select
-                                            id="type"
-                                            {...form.register('type')}
-                                            className="block w-full p-2.5 text-sm text-gray-900 bg-gray-50 border border-gray-300 rounded-lg focus:ring-primary-600 focus:border-primary-600"
-                                            required
-                                        >
-                                            <option value="private">Private</option>
-                                            <option value="public">Public</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <button
-                                    type="submit"
-                                    className="inline-flex items-center px-5 py-2.5 text-sm font-medium text-white bg-primary-700 rounded-lg focus:ring-4 focus:outline-none focus:ring-primary-300 hover:bg-primary-800"
-                                >
-                                   <Plus />
-                                    Add new school
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            )}
-        </>
-    )
-}
+  const clearForm = () => {
+    setFormData({
+      name: '',
+      address: '',
+      phone: '',
+      email: '',
+      city: '',
+      type: 'Public'
+    });
+  }
+  const { toast } = useToast()
+  return (
+    <Modal isOpen={isOpen} onClose={onClose}>
+      <div className="relative p-6 bg-white rounded-lg mt-3">
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label htmlFor="name" className="block text-sm font-medium text-gray-700">School Name</label>
+            <input
+              id="name"
+              name="name"
+              type="text"
+              placeholder="AcaData School"
+              value={formData.name}
+              onChange={handleChange}
+              required
+              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5"
+            />
+          </div>
+          <div className="space-y-4 md:flex md:space-y-0 md:space-x-4">
+            <div className="flex-1">
+              <label htmlFor="phone" className="block text-sm font-medium text-gray-700">Phone</label>
+              <input
+                id="phone"
+                name="phone"
+                type="text"
+                placeholder="+25474567890"
+                value={formData.phone}
+                onChange={handleChange}
+                required
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5"
+              />
+            </div>
+            <div className="flex-1">
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email</label>
+              <input
+                id="email"
+                name="email"
+                type="email"
+                placeholder="contact@acadataschool.com"
+                value={formData.email}
+                onChange={handleChange}
+                required
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5"
+              />
+            </div>
+          </div>
+          <div className="space-y-4 md:flex md:space-y-0 md:space-x-4">
+            <div className="flex-1">
+              <label htmlFor="address" className="block text-sm font-medium text-gray-700">Address</label>
+              <input
+                id="address"
+                name="address"
+                type="text"
+                placeholder="123 Main St"
+                value={formData.address}
+                onChange={handleChange}
+                required
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5"
+              />
+            </div>
+            <div className="flex-1">
+              <label htmlFor="city" className="block text-sm font-medium text-gray-700">City</label>
+              <input
+                id="city"
+                name="city"
+                type="text"
+                placeholder="City"
+                value={formData.city}
+                onChange={handleChange}
+                required
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5"
+              />
+            </div>
+          </div>
+          <div className='pb-1'>
+            <p className="text-sm text-gray-700 mt-2 pt-2 pb-2 lg:text-base">Type</p>
+            <div className='flex flex-col gap-2'>
+              <label htmlFor="private" className='flex items-center border border-gray-600 rounded-lg p-3 shadow-sm bg-white radio-label hover:border-[#3A5AFF] hover:border-[1.5px] cursor-pointer'>
+                <input 
+                  type="radio"
+                  id="private"
+                  name='type'
+                  value='Private'
+                  className='custom-radio'
+                  onChange={handleChange}
+                  checked={formData.type === 'Private'}
+                  required
+                />
+                <span className="text-gray-700 pl-3 font-bold">Private</span>
+              </label>
+              <label htmlFor="public" className='flex items-center border border-gray-600 rounded-lg p-3 shadow-sm bg-white radio-label hover:border-[#3A5AFF] hover:border-[1.5px] cursor-pointer'>
+                <input 
+                  type="radio"
+                  id="public"
+                  name='type'
+                  value='Public'
+                  className='custom-radio'
+                  onChange={handleChange}
+                  checked={formData.type === 'Public'}
+                  required
+                />
+                <span className="text-gray-700 pl-3 font-bold">Public</span>
+              </label>
+            </div>
+          </div>
+          <div className="flex justify-end">
+            <button
+              type="button"
+              onClick={onClose}
+              className="text-gray-700 bg-white border border-gray-300 hover:bg-gray-100 rounded-lg px-4 py-2 mr-2"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="flex items-center text-white bg-blue-600 hover:bg-blue-700 rounded-lg px-4 py-2"
+              onClick={() => {
+                toast({
+                  description: "School added successfully",
+                })
+              }}
+            >
+              <Plus className="mr-2" />
+              Add
+            </button>
+          </div>
+        </form>
+      </div>
+    </Modal>
+  );
+};
+
+export { CreateModal };

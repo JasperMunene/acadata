@@ -1,8 +1,10 @@
 'use client'
-import Searchbar from '@/components/Searchbar';
-import { CreateModal } from '@/components/modals/CreateModal';
+
 import React, { useEffect, useState } from 'react';
 import { Plus, ChevronDown, Filter, Ellipsis } from 'lucide-react';
+import { CreateModal } from '@/components/modals/CreateModal';
+import Searchbar from '@/components/Searchbar';
+import Footer from '@/components/Footer';
 import { supabase } from '@/lib/supabaseClient';
 import {
   DropdownMenu,
@@ -10,7 +12,7 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu";
 
 const MODAL_TYPES = {
   NONE: 'NONE',
@@ -29,37 +31,30 @@ type School = {
   phone: string;
   email: string;
   city: string;
-  type: 'Public' | 'Private';
+  type: 'public' | 'private';
 };
 
-interface Item {
-  id: number;
-  name: string;
-}
-
-const Page = () => {
+const Page: React.FC = () => {
   const [schools, setSchools] = useState<School[]>([]);
   const [modalType, setModalType] = useState<ModalType>(MODAL_TYPES.NONE);
- 
+  const [isCreateModalOpen, setCreateModalOpen] = useState(false);
+  const [fetchTrigger, setFetchTrigger] = useState(false);
 
   useEffect(() => {
     getSchools();
-  }, []);
-  const data: Item[] = [
-    { id: 1, name: 'Item 1' },
-    { id: 2, name: 'Item 2' },
-    { id: 3, name: 'Item 3' },
-  ];
+  }, [fetchTrigger]);
 
-
-  const openModal = (type: ModalType | null = null) => {
-    
-   
+  const openModal = (type: ModalType = MODAL_TYPES.NONE) => {
+    setModalType(type);
+    if (type === MODAL_TYPES.CREATE) {
+      setCreateModalOpen(true);
+    }
   };
 
   const closeModal = () => {
     setModalType(MODAL_TYPES.NONE);
-    
+    setCreateModalOpen(false);
+    setFetchTrigger(prev => !prev); // Toggle fetchTrigger to re-fetch schools
   };
 
   async function getSchools() {
@@ -71,9 +66,11 @@ const Page = () => {
     }
   }
 
+  
+
   return (
     <section className='p-6 lg:p-10'>
-      <div className="bg-white relative shadow-md sm:rounded-lg overflow-hidden">
+      <div className="bg-white relative overflow-hidden">
         <div className="flex flex-col md:flex-row items-center justify-between space-y-3 md:space-y-0 md:space-x-4 p-4">
           <Searchbar />
           <div className="w-full md:w-auto flex flex-col md:flex-row space-y-2 md:space-y-0 items-stretch md:items-center justify-end md:space-x-3 flex-shrink-0">
@@ -133,6 +130,8 @@ const Page = () => {
           </table>
         </div>
       </div>
+      <CreateModal isOpen={isCreateModalOpen} onClose={closeModal}  />
+      <Footer />
     </section>
   );
 }
