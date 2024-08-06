@@ -196,7 +196,7 @@ const Page: React.FC = () => {
           </div>
         </div>
         <CreateModal isOpen={isCreateModalOpen} onClose={closeModal} type='school' />
-        <DeleteModal isOpen={isDeleteModalOpen} onClose={closeModal} school={selectedSchool} />
+        <DeleteModal isOpen={isDeleteModalOpen} onClose={closeModal} school={selectedSchool} type='school' />
         {selectedSchool && (
           <UpdateModal
             isOpen={isUpdateModalOpen}

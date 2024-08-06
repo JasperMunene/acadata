@@ -13,7 +13,7 @@ type CreateModalProps = {
   onClose: () => void;
   type: 'school' | 'subject';
   classId?: number;
-  onSubjectAdded: (subject: Subject) => void;
+  onSubjectAdded?: (subject: Subject) => void;
 };
 
 const CreateModal: React.FC<CreateModalProps> = ({ isOpen, onClose, type, classId, onSubjectAdded }) => {
@@ -49,7 +49,7 @@ const CreateModal: React.FC<CreateModalProps> = ({ isOpen, onClose, type, classI
     if (error) {
       console.error(`Error inserting data into ${tableName}:`, error);
     } else {
-      if (type === 'subject' && data) {
+      if (type === 'subject' && data && onSubjectAdded) {
         onSubjectAdded(data[0]);
       }
       clearForm();
@@ -69,6 +69,7 @@ const CreateModal: React.FC<CreateModalProps> = ({ isOpen, onClose, type, classI
   };
 
   const { toast } = useToast();
+
 
   const renderFormFields = () => {
     if (type === 'school') {

@@ -12,6 +12,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { CreateModal } from '@/components/modals/CreateModal';
+import { DeleteModal } from '@/components/modals/DeleteModal';
 
 const MODAL_TYPES = {
   NONE: 'NONE',
@@ -24,6 +25,7 @@ const MODAL_TYPES = {
 type ModalType = typeof MODAL_TYPES[keyof typeof MODAL_TYPES];
 
 interface Subject {
+  subject_id: string;
   name: string;
 }
 
@@ -37,6 +39,54 @@ const AddSubject: React.FC = () => {
   const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
   const [selectedSubject, setSelectedSubject] = useState<Subject | null>(null);
   const [classId, setClassId] = useState<number>();
+  const [fetchTrigger, setFetchTrigger] = useState(false);
+
+  useEffect(() => {
+    getSubjects();
+  }, [grade, fetchTrigger]);
+
+  const getSubjects = async () => {
+    const gradeNumber = Number(grade);
+    if (isNaN(gradeNumber)) {
+      console.error('Invalid grade:', grade);
+      return;
+    }
+
+    const classId = await getClassIdByGrade(gradeNumber);
+    if (!classId) {
+      console.error('Class ID not found for grade:', gradeNumber);
+      setLoading(false);
+      return;
+    }
+
+    setClassId(classId.class_id);
+
+    const { data, error } = await supabase
+      .from('subjects')
+      .select('subject_id, name')
+      .eq('class_id', classId.class_id);
+
+    if (error) {
+      console.error('Error fetching subjects:', error);
+    } else {
+      setSubjects(data);
+    }
+    setLoading(false);
+  };
+
+  const getClassIdByGrade = async (grade: number) => {
+    const { data, error } = await supabase
+      .from('classes')
+      .select('class_id')
+      .eq('grade', grade)
+      .single();
+
+    if (error) {
+      console.error('Error fetching class ID:', error);
+      return null;
+    }
+    return data;
+  };
 
   const handleSearch = (searchTerm: string) => {
     const filteredSubjects = subjects.filter(subject =>
@@ -44,55 +94,6 @@ const AddSubject: React.FC = () => {
     );
     setSubjects(filteredSubjects);
   };
-
-  useEffect(() => {
-    const getSubjects = async () => {
-      const gradeNumber = Number(grade);
-      if (isNaN(gradeNumber)) {
-        console.error('Invalid grade:', grade);
-        return;
-      }
-
-      const classId = await getClassIdByGrade(gradeNumber);
-      if (!classId) {
-        console.error('Class ID not found for grade:', gradeNumber);
-        setLoading(false);
-        return;
-      }
-
-      setClassId(classId.class_id);
-
-      const { data, error } = await supabase
-        .from('subjects')
-        .select('name')
-        .eq('class_id', classId.class_id);
-
-      if (error) {
-        console.error('Error fetching subjects:', error);
-      } else {
-        setSubjects(data);
-      }
-      setLoading(false);
-    };
-
-    const getClassIdByGrade = async (grade: number) => {
-      const { data, error } = await supabase
-        .from('classes')
-        .select('class_id')
-        .eq('grade', grade)
-        .single();
-
-      if (error) {
-        console.error('Error fetching class ID:', error);
-        return null;
-      }
-      return data;
-    };
-
-    if (grade) {
-      getSubjects();
-    }
-  }, [grade, subjects]);
 
   const openModal = (type: ModalType = MODAL_TYPES.NONE, subject: Subject | null = null) => {
     setModalType(type);
@@ -113,6 +114,7 @@ const AddSubject: React.FC = () => {
     setUpdateModalOpen(false);
     setDeleteModalOpen(false);
     setSelectedSubject(null);
+    setFetchTrigger(prev => !prev);
   };
 
   const handleSubjectAdded = (newSubject: Subject) => {
@@ -143,9 +145,9 @@ const AddSubject: React.FC = () => {
               <thead className="text-xs text-gray-700 uppercase bg-gray-50">
                 <tr>
                   <th scope="col" className="px-4 py-3">Subject Name</th>
-                  <th scope='col' className='px-4 py-3'>
-                  <span className='sr-only'>Actions</span>
-                </th>
+                  <th scope="col" className="px-4 py-3">
+                    <span className="sr-only">Actions</span>
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -157,34 +159,34 @@ const AddSubject: React.FC = () => {
                   subjects.map((subject, index) => (
                     <tr key={index} className="bg-white border-b">
                       <td className="px-4 py-3">{subject.name}</td>
-                      <td className='px-4 py-3 flex items-center justify-end'>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <div className='inline-flex items-center p-0.5 text-sm font-medium text-center text-gray-500 hover:text-gray-800 rounded-lg focus:outline-none'>
-                          <Ellipsis />
-                        </div>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent className='py-1 text-sm text-blue-500 bg-gray-100'>
-                        <DropdownMenuItem>
-                          <button
-                            onClick={() => openModal(MODAL_TYPES.UPDATE, subject)}
-                            className='block py-2 px-4 text-gray-700 font-semibold cursor-pointer'
-                          >
-                            Edit
-                          </button>
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem>
-                          <button
-                            onClick={() => openModal(MODAL_TYPES.DELETE, subject)}
-                            className='block py-2 px-4 text-gray-700 font-semibold cursor-pointer'
-                          >
-                            Delete
-                          </button>
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </td>
+                      <td className="px-4 py-3 flex items-center justify-end">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <div className="inline-flex items-center p-0.5 text-sm font-medium text-center text-gray-500 hover:text-gray-800 rounded-lg focus:outline-none">
+                              <Ellipsis />
+                            </div>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent className="py-1 text-sm text-blue-500 bg-gray-100">
+                            <DropdownMenuItem>
+                              <button
+                                onClick={() => openModal(MODAL_TYPES.UPDATE, subject)}
+                                className="block py-2 px-4 text-gray-700 font-semibold cursor-pointer"
+                              >
+                                Edit
+                              </button>
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem>
+                              <button
+                                onClick={() => openModal(MODAL_TYPES.DELETE, subject)}
+                                className="block py-2 px-4 text-gray-700 font-semibold cursor-pointer"
+                              >
+                                Delete
+                              </button>
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </td>
                     </tr>
                   ))
                 ) : (
@@ -197,7 +199,8 @@ const AddSubject: React.FC = () => {
           </div>
         </div>
       </section>
-      <CreateModal isOpen={isCreateModalOpen} onClose={closeModal} type='subject' classId={classId} onSubjectAdded={handleSubjectAdded} />
+      <CreateModal isOpen={isCreateModalOpen} onClose={closeModal} type="subject" classId={classId} />
+      <DeleteModal isOpen={isDeleteModalOpen} onClose={closeModal} subject={selectedSubject} type="subject" />
     </div>
   );
 };
