@@ -52,11 +52,13 @@ const DeleteModal: React.FC<DeleteModalProps> = ({ isOpen, onClose, school, subj
         toast({
           title: `Error deleting ${type}`,
           description: error.message,
+          className: 'bg-gray-100'
         });
       } else {
         console.log(`${type.charAt(0).toUpperCase() + type.slice(1)} deleted successfully`);
         toast({
           title: `${type.charAt(0).toUpperCase() + type.slice(1)} deleted successfully`,
+          className: 'bg-gray-100'
         });
         onClose();
       }
@@ -65,6 +67,7 @@ const DeleteModal: React.FC<DeleteModalProps> = ({ isOpen, onClose, school, subj
       toast({
         title: `Error deleting ${type}`,
         description: (error as Error).message,
+        className: 'bg-gray-100'
       });
       onClose();
     }

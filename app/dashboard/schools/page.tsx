@@ -202,6 +202,7 @@ const Page: React.FC = () => {
             isOpen={isUpdateModalOpen}
             onClose={closeModal}
             school={selectedSchool}
+            type='school'
           />
         )}
         <Footer

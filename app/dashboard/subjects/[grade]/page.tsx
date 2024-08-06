@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { CreateModal } from '@/components/modals/CreateModal';
 import { DeleteModal } from '@/components/modals/DeleteModal';
+import { UpdateModal } from '@/components/modals/UpdateModal';
 
 const MODAL_TYPES = {
   NONE: 'NONE',
@@ -201,6 +202,14 @@ const AddSubject: React.FC = () => {
       </section>
       <CreateModal isOpen={isCreateModalOpen} onClose={closeModal} type="subject" classId={classId} />
       <DeleteModal isOpen={isDeleteModalOpen} onClose={closeModal} subject={selectedSubject} type="subject" />
+      {selectedSubject && (
+          <UpdateModal
+            isOpen={isUpdateModalOpen}
+            onClose={closeModal}
+            subject={selectedSubject}
+            type='subject'
+          />
+        )}
     </div>
   );
 };
