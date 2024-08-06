@@ -1,7 +1,7 @@
 'use client';
 import React, { useRef, useState, ChangeEvent, DragEvent } from 'react';
 
-const Home: React.FC = () => {
+const FileUpload: React.FC = () => {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [isDragging, setIsDragging] = useState<boolean>(false);
 
@@ -102,4 +102,4 @@ const Home: React.FC = () => {
   );
 };
 
-export default Home;
+export default FileUpload;

@@ -89,33 +89,6 @@
     @apply relative size-5 max-xl:w-full max-xl:flex max-xl:justify-center max-xl:items-center;
   }
   
-  .custom-radio {
-    appearance: none;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    width: 1rem;
-    height: 1rem;
-    border: 2px solid hsl(202, 55%, 16%);
-    border-radius: 50%;
-    outline: none;
-    cursor: pointer;
-    transition: background-color 0.2s, border-color 0.2s, box-shadow 0.2s;
-  }
-  .custom-radio:checked {
-    background-color: #3A5AFF;
-    border-color: #3A5AFF;
-    box-shadow: inset 0 0 0 2px white; /* Creates padding effect */
-  }
-  
-  .radio-label {
-    transition: background-color 0.2s, border-color 0.2s;
-  }
-  
-  .radio-label:has(input[type="radio"]:checked),
-  .radio-label:has(input[type="radio"]:focus) {
-    background-color: rgba(58, 90, 255, 0.12); /* Set opacity to 0.15 */
-    border-color: #3A5AFF;
-  }
   
 }
 

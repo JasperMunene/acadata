@@ -6,7 +6,7 @@ import { targetAudience, icons } from '@/constants/constants';
 const Audience = () => {
   return (
     <div className='mt-5 bg-[#F2F2F2] lg:p-10'>
-        <h1 className='text-center text-3xl font-bold md:text-4xl lg:text-5xl pt-10'>
+        <h1 className='text-center text-2xl font-bold md:text-4xl lg:text-5xl pt-10'>
           Who <span className='border-b-4 border-blue-500'>is AcaData</span> for
         </h1>
         <div className='mt-5 p-5 grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mx-6'>

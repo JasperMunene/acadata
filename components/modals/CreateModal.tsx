@@ -2,15 +2,21 @@ import React, { useState } from 'react';
 import Modal from './Modal';
 import { Plus } from 'lucide-react';
 import { supabase } from '@/lib/supabaseClient';
-import { useToast } from "@/components/ui/use-toast"
+import { useToast } from "@/components/ui/use-toast";
+
+interface Subject {
+  name: string;
+}
 
 type CreateModalProps = {
   isOpen: boolean;
   onClose: () => void;
-  
+  type: 'school' | 'subject';
+  classId?: number;
+  onSubjectAdded: (subject: Subject) => void;
 };
 
-const CreateModal: React.FC<CreateModalProps> = ({ isOpen, onClose }) => {
+const CreateModal: React.FC<CreateModalProps> = ({ isOpen, onClose, type, classId, onSubjectAdded }) => {
   const [formData, setFormData] = useState({
     name: '',
     address: '',
@@ -22,16 +28,30 @@ const CreateModal: React.FC<CreateModalProps> = ({ isOpen, onClose }) => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const { error } = await supabase.from('schools').insert([formData]);
+    let tableName = '';
+    let dataToInsert: any = {};
+
+    if (type === 'school') {
+      tableName = 'schools';
+      dataToInsert = { ...formData };
+    } else if (type === 'subject' && classId) {
+      tableName = 'subjects';
+      dataToInsert = { name: formData.name, class_id: classId };
+    }
+
+    const { data, error } = await supabase.from(tableName).insert([dataToInsert]);
 
     if (error) {
-      console.error('Error inserting data:', error);
+      console.error(`Error inserting data into ${tableName}:`, error);
     } else {
+      if (type === 'subject' && data) {
+        onSubjectAdded(data[0]);
+      }
       clearForm();
       onClose(); // Automatically close the modal after submission
     }
@@ -46,12 +66,14 @@ const CreateModal: React.FC<CreateModalProps> = ({ isOpen, onClose }) => {
       city: '',
       type: 'Public'
     });
-  }
-  const { toast } = useToast()
-  return (
-    <Modal isOpen={isOpen} onClose={onClose}>
-      <div className="relative p-6 bg-white rounded-lg mt-3">
-        <form onSubmit={handleSubmit} className="space-y-4">
+  };
+
+  const { toast } = useToast();
+
+  const renderFormFields = () => {
+    if (type === 'school') {
+      return (
+        <>
           <div>
             <label htmlFor="name" className="block text-sm font-medium text-gray-700">School Name</label>
             <input
@@ -121,37 +143,64 @@ const CreateModal: React.FC<CreateModalProps> = ({ isOpen, onClose }) => {
               />
             </div>
           </div>
-          <div className='pb-1'>
-            <p className="text-sm text-gray-700 mt-2 pt-2 pb-2 lg:text-base">Type</p>
-            <div className='flex flex-col gap-2'>
-              <label htmlFor="private" className='flex items-center border border-gray-600 rounded-lg p-3 shadow-sm bg-white radio-label hover:border-[#3A5AFF] hover:border-[1.5px] cursor-pointer'>
-                <input 
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Type</label>
+            <div className="mt-1 flex gap-6">
+              <label className="inline-flex items-center">
+                <input
                   type="radio"
                   id="private"
-                  name='type'
-                  value='Private'
-                  className='custom-radio'
+                  name="type"
+                  value="Private"
+                  className="form-radio"
                   onChange={handleChange}
                   checked={formData.type === 'Private'}
                   required
                 />
-                <span className="text-gray-700 pl-3 font-bold">Private</span>
+                <span className="ml-2">Private</span>
               </label>
-              <label htmlFor="public" className='flex items-center border border-gray-600 rounded-lg p-3 shadow-sm bg-white radio-label hover:border-[#3A5AFF] hover:border-[1.5px] cursor-pointer'>
-                <input 
+              <label className="inline-flex items-center">
+                <input
                   type="radio"
                   id="public"
-                  name='type'
-                  value='Public'
-                  className='custom-radio'
+                  name="type"
+                  value="Public"
+                  className="form-radio"
                   onChange={handleChange}
                   checked={formData.type === 'Public'}
                   required
                 />
-                <span className="text-gray-700 pl-3 font-bold">Public</span>
+                <span className="ml-2">Public</span>
               </label>
             </div>
           </div>
+        </>
+      );
+    } else if (type === 'subject') {
+      return (
+        <div>
+          <label htmlFor="name" className="block text-sm font-medium text-gray-700">Subject Name</label>
+          <input
+            id="name"
+            name="name"
+            type="text"
+            placeholder="Mathematics"
+            value={formData.name}
+            onChange={handleChange}
+            required
+            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5"
+          />
+        </div>
+      );
+    }
+    return null;
+  };
+
+  return (
+    <Modal isOpen={isOpen} onClose={onClose}>
+      <div className="relative p-6 bg-white rounded-lg mt-3">
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {renderFormFields()}
           <div className="flex justify-end">
             <button
               type="button"
@@ -165,8 +214,9 @@ const CreateModal: React.FC<CreateModalProps> = ({ isOpen, onClose }) => {
               className="flex items-center text-white bg-blue-600 hover:bg-blue-700 rounded-lg px-4 py-2"
               onClick={() => {
                 toast({
-                  description: "School added successfully",
-                })
+                  description: `${type.charAt(0).toUpperCase() + type.slice(1)} added successfully`,
+                  className: 'bg-gray-100'
+                });
               }}
             >
               <Plus className="mr-2" />

@@ -3,6 +3,8 @@ import React, { useEffect } from 'react'
 import { Topbar } from '@/components/topbar'
 import Hero from '@/components/Hero'
 import Audience from '@/components/Audience'
+import Features from '@/components/Features'
+
 
 const page = () => {
   return (
@@ -10,6 +12,7 @@ const page = () => {
       <Topbar />
       <Hero />
       <Audience />
+      <Features />
       </div>
   )
 }

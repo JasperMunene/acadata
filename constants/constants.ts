@@ -86,6 +86,23 @@ export const sidebarLinks: sidebarLinks[] = [
   
 ];
 
+interface Grade {
+  name: string;
+  path: string;
+}
+
+export const grades: Grade[] = [
+  { name: 'Grade 1', path: '1' },
+  { name: 'Grade 2', path: '2' },
+  { name: 'Grade 3', path: '3' },
+  { name: 'Grade 4', path: '4' },
+  { name: 'Grade 5', path: '5' },
+  { name: 'Grade 6', path: '6' },
+  { name: 'Grade 7', path: '7' },
+  { name: 'Grade 8', path: '8' },
+  { name: 'Grade 9', path: '9' },
+];
+
 export const icons = {
   Ruler,
   BookOpen,

@@ -23,7 +23,7 @@ const Sidebar = () => {
               <div className="relative size-6">
                 <IconComponent className="sidebar-icon" color={`${isActive ? 'white' : 'black'}`} />
               </div>
-              <p className={`sidebar-label ${isActive ? 'text-white' : 'text-black hover:text-[1.35rem]'}`}>
+              <p className={`sidebar-label ${isActive ? 'text-white' : 'text-black hover:text-[1.1rem]'}`}>
                 {item.label}
               </p>
             </Link>
